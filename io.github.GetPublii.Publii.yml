@@ -1,0 +1,129 @@
+app-id: io.github.GetPublii.Publii
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '25.08'
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.node24
+command: publii
+separate-locales: false
+
+finish-args:
+  - --share=ipc
+  - --share=network # website deployment: ftp, sftp, s3, github, etc.
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --filesystem=xdg-documents/Publii:create # path to Publii data folder in user's documents
+  - --talk-name=org.freedesktop.secrets # keytar saves deployment credentials
+  - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons
+
+build-options:
+  append-path: /usr/lib/sdk/node24/bin
+  env:
+    NPM_CONFIG_LOGLEVEL: info
+
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /share/man
+
+modules:
+  # libsecret... electron base app already builds libsecret, but removes
+  # /include & /lib/pkgconfig during cleanup. keytar needs them for the
+  # node-gyp build. so, version, sha256 and config-opts are taken 1:1
+  # from the base app and the cleanup is missing here on purpose.
+  - name: libsecret
+    buildsystem: meson
+    config-opts:
+      - -Dmanpage=false
+      - -Dcrypto=disabled
+      - -Dvapi=false
+      - -Dgtk_doc=false
+      - -Dintrospection=false
+      - -Dbash_completion=disabled
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libsecret/0.21/libsecret-0.21.7.tar.xz
+        sha256: 6b452e4750590a2b5617adc40026f28d2f4903de15f1250e1d1c40bfd68ed55e
+
+  - name: publii
+    buildsystem: simple
+    subdir: main
+    build-options:
+      env:
+        # flatpak-node-generator cache & electron-dist
+        XDG_CACHE_HOME: /run/build/publii/flatpak-node/cache
+        npm_config_cache: /run/build/publii/flatpak-node/npm-cache
+        npm_config_offline: 'true'
+
+    build-commands:
+      # guard for npmRebuild=false: better-sqlite3 is built against the sdk
+      # node and won't load under electron. only harmless because publii picks
+      # node-sqlite3-wasm on linux. if that changes, fail here instead of at
+      # the first db access.
+      - |
+        unguarded=$(grep -rn "require('better-sqlite3')" app --include=*.js |
+                    grep -v node_modules |
+                    grep -v "os.platform() === 'linux' ? require('node-sqlite3-wasm')" ||
+                    true)
+        if [ -n "$unguarded" ]; then
+          echo "ERROR: better-sqlite3 now required (!!!)" >&2
+          echo "$unguarded" >&2
+          exit 1
+        fi
+
+      # PUBLII AFTERPACK-HOOK: sets setuid on chrome sandbox. sandboxing is handled by zypak.
+      - echo 'exports.default = () => true;' > build/scripts/afterPack.js
+
+      # BUILD TOOLS: webpack, sass, electron-builder
+      - npm install --offline
+
+      # RUNTIME DEPS: app/package.json, keytar
+      - cd app && npm install --offline
+
+      # RENDERER BUNDLE: app/dist/build.js
+      - npm run prod
+
+      # EDITOR ASSETS: sass, tinymce, jquery -> app/dist/vendor
+      - mkdir -p app/dist/css
+      - npm run prepare-editor
+
+      # BUILD DIRECTORY: unpacked linux directory with publii own electron-builder config
+      - |
+        . ../flatpak-node/electron-builder-arch-args.sh
+        ./node_modules/.bin/electron-builder build $ELECTRON_BUILDER_ARCH_ARGS --linux --dir --config.npmRebuild=false
+
+      # INSTALL
+      - cp -a dist/linux*unpacked /app/main
+      - rm -f /app/main/chrome-sandbox # zypak replaces chromium sandbox
+      - rm -f /app/main/LICENSES.chromium.html # no need for 19 mb chromium license
+      - install -Dm755 -t /app/bin/ ../publii
+      - install -Dm644 ../io.github.GetPublii.Publii.desktop /app/share/applications/io.github.GetPublii.Publii.desktop
+      - install -Dm644 ../io.github.GetPublii.Publii.metainfo.xml /app/share/metainfo/io.github.GetPublii.Publii.metainfo.xml
+      - install -Dm644 ../io.github.GetPublii.Publii.png /app/share/icons/hicolor/512x512/apps/io.github.GetPublii.Publii.png
+
+    sources:
+      # no x-checker-data on purpose. version bumps go through github workflow,
+      # because generated-sources.json must be regenerated along with the tag.
+      - type: git
+        url: https://github.com/GetPublii/Publii.git
+        tag: v.0.47.9-build-17481
+        commit: d6d4961fcff5b1530ef583e2eac32322ea22a618
+        dest: main
+
+      - generated-sources.json
+
+      - type: file
+        path: io.github.GetPublii.Publii.desktop
+      - type: file
+        path: io.github.GetPublii.Publii.metainfo.xml
+      - type: file
+        path: io.github.GetPublii.Publii.png
+
+      # START: zypak-wrapper & ozone-hint for native electron on wayland
+      - type: script
+        dest-filename: publii
+        commands:
+          - exec zypak-wrapper.sh /app/main/Publii --ozone-platform-hint=auto "$@"

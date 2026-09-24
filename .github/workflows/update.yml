@@ -1,0 +1,55 @@
+name: check for new publii version
+
+on:
+  schedule:
+    # github delays scheduled runs at the top of every hour
+    - cron: '30 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: publii-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        run: git clone --depth 1 --branch "$GITHUB_REF_NAME" "https://x-access-token:${{ github.token }}@github.com/$GITHUB_REPOSITORY" .
+
+      # PEP 668
+      - name: deps
+        run: |
+          python3 -m venv "$HOME/.venv"
+          "$HOME/.venv/bin/pip" install --quiet pyyaml "git+https://github.com/flatpak/flatpak-builder-tools#subdirectory=node"
+          echo "$HOME/.venv/bin" >> "$GITHUB_PATH"
+
+      - name: check for new version and regenerate sources
+        id: update
+        run: python3 update-publii.py
+
+      - name: create Pull Request
+        if: steps.update.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update/publii-${{ steps.update.outputs.version }}
+          delete-branch: true
+          title: 'Update Publii to ${{ steps.update.outputs.version }}'
+          commit-message: 'Update Publii to ${{ steps.update.outputs.version }}'
+          body: |
+            # automatic update pr
+
+            * upstream version: `${{ steps.update.outputs.version }}`
+            * tag: `${{ steps.update.outputs.tag }}`
+
+            <details><summary>libsecret check</summary>
+
+            ```
+            ${{ steps.update.outputs.libsecret_note }}
+            ```
+
+            </details>
