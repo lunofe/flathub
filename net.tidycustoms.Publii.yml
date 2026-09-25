@@ -16,7 +16,6 @@ finish-args:
   - --socket=fallback-x11
   - --device=dri
   - --filesystem=xdg-documents/Publii:create # path to Publii data folder in user's documents
-  - --talk-name=org.freedesktop.secrets # keytar saves deployment credentials
   - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons
 
 build-options:
@@ -38,7 +37,7 @@ modules:
     buildsystem: meson
     config-opts:
       - -Dmanpage=false
-      - -Dcrypto=disabled
+      - -Dcrypto=libgcrypt # secret portal is only compiled when crypto is on
       - -Dvapi=false
       - -Dgtk_doc=false
       - -Dintrospection=false

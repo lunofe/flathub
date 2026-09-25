@@ -27,6 +27,9 @@ BASEAPP_YML = ('https://raw.githubusercontent.com/flathub/'
                'org.electronjs.Electron2.BaseApp/master/'
                'org.electronjs.Electron2.BaseApp.yml')
 
+# crypto has to be on so meson compiles secret portal
+LIBSECRET_ALLOWED_DEVIATIONS = {'-Dcrypto=libgcrypt', '-Dcrypto=disabled'}
+
 USER_AGENT = 'publii-flatpak-updater'
 
 
@@ -150,8 +153,12 @@ def check_libsecret_drift():
                         shown(baseapp_src.get('sha256'))))
     manifest_opts = sorted(manifest_mod.get('config-opts') or [])
     baseapp_opts = sorted(baseapp_mod.get('config-opts') or [])
-    only_baseapp = [o for o in baseapp_opts if o not in manifest_opts]
-    only_manifest = [o for o in manifest_opts if o not in baseapp_opts]
+    only_baseapp = [o for o in baseapp_opts
+                    if o not in manifest_opts
+                    and o not in LIBSECRET_ALLOWED_DEVIATIONS]
+    only_manifest = [o for o in manifest_opts
+                     if o not in baseapp_opts
+                     and o not in LIBSECRET_ALLOWED_DEVIATIONS]
     if only_baseapp:
         diffs.append('  config-opts only in BaseApp:  ' + ' '.join(only_baseapp))
     if only_manifest:
