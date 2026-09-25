@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-    <id>io.github.GetPublii.Publii</id>
+    <id>net.tidycustoms.Publii</id>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0-or-later</project_license>
 
@@ -41,7 +41,7 @@
         </p>
     </description>
 
-    <launchable type="desktop-id">io.github.GetPublii.Publii.desktop</launchable>
+    <launchable type="desktop-id">net.tidycustoms.Publii.desktop</launchable>
 
     <screenshots>
         <screenshot type="default">

@@ -1,4 +1,4 @@
-app-id: io.github.GetPublii.Publii
+app-id: net.tidycustoms.Publii
 runtime: org.freedesktop.Platform
 runtime-version: '26.08'
 sdk: org.freedesktop.Sdk
@@ -100,12 +100,12 @@ modules:
       - rm -f /app/main/chrome-sandbox # zypak replaces chromium sandbox
       - rm -f /app/main/LICENSES.chromium.html # no need for 19 mb chromium license
       - install -Dm755 -t /app/bin/ ../publii
-      - install -Dm644 ../io.github.GetPublii.Publii.desktop /app/share/applications/io.github.GetPublii.Publii.desktop
-      - install -Dm644 ../io.github.GetPublii.Publii.metainfo.xml /app/share/metainfo/io.github.GetPublii.Publii.metainfo.xml
+      - install -Dm644 ../net.tidycustoms.Publii.desktop /app/share/applications/net.tidycustoms.Publii.desktop
+      - install -Dm644 ../net.tidycustoms.Publii.metainfo.xml /app/share/metainfo/net.tidycustoms.Publii.metainfo.xml
       - |
         ICONS=/app/share/icons/hicolor/512x512/apps
         mkdir -p $ICONS
-        gdk-pixbuf-thumbnailer -s 512 build/icon.png $ICONS/io.github.GetPublii.Publii.png
+        gdk-pixbuf-thumbnailer -s 512 build/icon.png $ICONS/net.tidycustoms.Publii.png
 
     sources:
       # no x-checker-data on purpose. version bumps go through github workflow,
@@ -119,9 +119,9 @@ modules:
       - generated-sources.json
 
       - type: file
-        path: io.github.GetPublii.Publii.desktop
+        path: net.tidycustoms.Publii.desktop
       - type: file
-        path: io.github.GetPublii.Publii.metainfo.xml
+        path: net.tidycustoms.Publii.metainfo.xml
 
       # START: zypak-wrapper & ozone-hint for native electron on wayland
       - type: script

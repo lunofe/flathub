@@ -17,7 +17,7 @@ from pathlib import Path
 
 import yaml
 
-APP_ID = 'io.github.GetPublii.Publii'
+APP_ID = 'net.tidycustoms.Publii'
 MANIFEST = Path(APP_ID + '.yml')
 METAINFO = Path(APP_ID + '.metainfo.xml')
 SOURCES = Path('generated-sources.json')
