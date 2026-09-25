@@ -35,10 +35,6 @@
             Open Graph and Twitter Card metadata, responsive images with optional WebP conversion,
             and an optional cookie consent banner.
         </p>
-        <p>
-            This Flatpak package is maintained by the community and is not affiliated with
-            TidyCustoms, the developer of Publii.
-        </p>
     </description>
 
     <launchable type="desktop-id">net.tidycustoms.Publii.desktop</launchable>
