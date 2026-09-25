@@ -102,7 +102,10 @@ modules:
       - install -Dm755 -t /app/bin/ ../publii
       - install -Dm644 ../io.github.GetPublii.Publii.desktop /app/share/applications/io.github.GetPublii.Publii.desktop
       - install -Dm644 ../io.github.GetPublii.Publii.metainfo.xml /app/share/metainfo/io.github.GetPublii.Publii.metainfo.xml
-      - install -Dm644 ../io.github.GetPublii.Publii.png /app/share/icons/hicolor/512x512/apps/io.github.GetPublii.Publii.png
+      - |
+        ICONS=/app/share/icons/hicolor/512x512/apps
+        mkdir -p $ICONS
+        gdk-pixbuf-thumbnailer -s 512 build/icon.png $ICONS/io.github.GetPublii.Publii.png
 
     sources:
       # no x-checker-data on purpose. version bumps go through github workflow,
@@ -119,8 +122,6 @@ modules:
         path: io.github.GetPublii.Publii.desktop
       - type: file
         path: io.github.GetPublii.Publii.metainfo.xml
-      - type: file
-        path: io.github.GetPublii.Publii.png
 
       # START: zypak-wrapper & ozone-hint for native electron on wayland
       - type: script
