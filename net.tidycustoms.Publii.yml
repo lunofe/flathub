@@ -73,9 +73,6 @@ modules:
           exit 1
         fi
 
-      # PUBLII AFTERPACK-HOOK: sets setuid on chrome sandbox. sandboxing is handled by zypak.
-      - echo 'exports.default = () => true;' > build/scripts/afterPack.js
-
       # BUILD TOOLS: webpack, sass, electron-builder
       - npm install --offline
 
@@ -114,6 +111,14 @@ modules:
         tag: v.0.47.9-build-17481
         commit: d6d4961fcff5b1530ef583e2eac32322ea22a618
         dest: main
+
+      # PUBLII AFTERPACK-HOOK: upstream calls setuid() on the chrome sandbox.
+      # sandboxing is handled by zypak.
+      - type: inline
+        contents: |
+          exports.default = () => true;
+        dest: main/build/scripts
+        dest-filename: afterPack.js
 
       - generated-sources.json
 
