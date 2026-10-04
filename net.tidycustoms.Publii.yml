@@ -97,6 +97,13 @@ modules:
         commit: d6d4961fcff5b1530ef583e2eac32322ea22a618
         dest: main
 
+      # upstream creates sites/ and config/ only when the data folder is missing.
+      # --filesystem=...:create makes flatpak create it first, so both are skipped
+      # and publii errors
+      - type: patch
+        path: create-missing-data-dirs.patch
+        dest: main
+
       # PUBLII AFTERPACK-HOOK: upstream calls setuid() on the chrome sandbox.
       # sandboxing is handled by zypak.
       - type: inline

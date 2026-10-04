@@ -1,0 +1,19 @@
+diff --git a/app/back-end/app.js b/app/back-end/app.js
+index a508893..85bedd2 100644
+--- a/app/back-end/app.js
++++ b/app/back-end/app.js
+@@ -115,6 +115,14 @@ class App {
+             fs.mkdirSync(path.join(this.appDir, 'plugins'));
+         }
+ 
++        if (!fs.existsSync(path.join(this.appDir, 'sites'))) {
++            fs.mkdirSync(path.join(this.appDir, 'sites'));
++        }
++
++        if (!fs.existsSync(path.join(this.appDir, 'config'))) {
++            fs.mkdirSync(path.join(this.appDir, 'config'));
++        }
++
+         if (!fs.existsSync(path.join(this.appDir, 'backups'))) {
+             fs.mkdirSync(path.join(this.appDir, 'backups'));
+         }
