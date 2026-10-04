@@ -5,7 +5,7 @@
     <project_license>GPL-3.0-or-later</project_license>
 
     <name>Publii</name>
-    <summary>Build and publish static websites</summary>
+    <summary>Static CMS for privacy-focused, SEO-optimized websites</summary>
 
     <developer id="net.tidycustoms">
         <name>TidyCustoms</name>
@@ -13,27 +13,13 @@
 
     <description>
         <p>
-            Publii is a desktop content management system that produces static websites. Content
-            lives on your own machine in a local database, and the site is rendered to plain HTML
-            before it is uploaded. There is no database, no admin login and no server-side code on
-            the published site.
+            Publii is a desktop-based CMS for Windows, Mac and Linux that makes creating static websites fast and hassle-free, even for beginners.
         </p>
         <p>
-            Writing happens in a block editor, a rich text editor or plain Markdown, with a live
-            preview of the rendered page. Themes are configured through a graphical options panel
-            rather than by editing template files.
+            Unlike static-site generators that are often unwieldy and difficult to use, Publii provides an easy-to-understand UI much like server-based CMSs such as WordPress or Joomla!, where users can create posts and other site content, and style their site using a variety of built-in themes and options. Users can enjoy the benefits of a super-fast and secure static website, with all the convenience that a CMS provides.
         </p>
-        <p>Publii can upload a finished site over:</p>
-        <ul>
-            <li>FTP and SFTP, with password or key authentication</li>
-            <li>Amazon S3 and Google Cloud Storage</li>
-            <li>GitHub Pages, GitLab Pages and Netlify</li>
-            <li>Plain Git, or a downloadable archive for manual upload</li>
-        </ul>
         <p>
-            Only changed files are transferred on each upload. Generated sites include a sitemap,
-            Open Graph and Twitter Card metadata, responsive images with optional WebP conversion,
-            and an optional cookie consent banner.
+            What makes Publii even more unique is that the app runs locally on your desktop rather than on the site's server. Available for Windows, Mac, Linux once the app has been installed you can create a site in minutes, even without internet access; since Publii is a desktop app you can create, update and modify your site offline, then upload the site changes to your server at the click of a button. Publii supports multiple upload options, including standard HTTP/HTTPS servers, Netlify, Amazon S3, GitHub Pages and Google Cloud or SFTP.
         </p>
     </description>
 
@@ -100,10 +86,7 @@
         <release version="0.47.9" date="2026-07-23">
             <description>
                 <p>
-                    This quick maintenance release addresses a few specific regressions
-                    and issues reported after the recent update, including SFTP deployment
-                    problems, slash handling on the blog page, and further refinements to
-                    JSON rendering.
+                    This quick maintenance release addresses a few specific regressions and issues reported after the recent update, including SFTP deployment problems, slash handling on the blog page, and further refinements to JSON rendering.
                 </p>
             </description>
             <url type="details">https://getpublii.com/blog/release-047.html#hotfix-0-47-9</url>
