@@ -219,11 +219,37 @@ def resolve_tag(version, build):
     raise SystemExit('no tag found for %s' % version)
 
 
+def check_better_sqlite3(src):
+    """
+    guard for npmRebuild=false: better-sqlite3 is built against the sdk
+    node and won't load under electron. only harmless because publii picks
+    node-sqlite3-wasm on linux. if that changes, fail here instead of at
+    the first db access.
+    """
+    unguarded = []
+    for path in sorted((src / 'app').rglob('*.js')):
+        if 'node_modules' in path.parts:
+            continue
+        text = path.read_text(encoding='utf-8', errors='replace')
+        if "require('better-sqlite3')" not in text:
+            continue
+        for num, line in enumerate(text.splitlines(), 1):
+            if "require('better-sqlite3')" not in line:
+                continue
+            if "os.platform() === 'linux' ? require('node-sqlite3-wasm')" in line:
+                continue
+            unguarded.append('  %s:%d: %s' % (path.relative_to(src), num, line.strip()))
+    if unguarded:
+        raise SystemExit('better-sqlite3 is no longer guarded:\n' + '\n'.join(unguarded))
+    print('better-sqlite3: still guarded behind node-sqlite3-wasm.')
+
+
 def regenerate_sources(tag):
     with tempfile.TemporaryDirectory() as work:
         src = Path(work) / 'src'
         run(['git', 'clone', '--quiet', '--depth', '1', '--branch', tag,
              'https://github.com/%s.git' % UPSTREAM, str(src)])
+        check_better_sqlite3(src)
         print('generating %s ...' % SOURCES)
         # --recursive: both package-lock.json (root & app/)
         # --electron-node-headers: headers for node-gyp

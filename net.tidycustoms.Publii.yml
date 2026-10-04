@@ -58,21 +58,6 @@ modules:
         npm_config_offline: 'true'
 
     build-commands:
-      # guard for npmRebuild=false: better-sqlite3 is built against the sdk
-      # node and won't load under electron. only harmless because publii picks
-      # node-sqlite3-wasm on linux. if that changes, fail here instead of at
-      # the first db access.
-      - |
-        unguarded=$(grep -rn "require('better-sqlite3')" app --include=*.js |
-                    grep -v node_modules |
-                    grep -v "os.platform() === 'linux' ? require('node-sqlite3-wasm')" ||
-                    true)
-        if [ -n "$unguarded" ]; then
-          echo "ERROR: better-sqlite3 now required (!!!)" >&2
-          echo "$unguarded" >&2
-          exit 1
-        fi
-
       # BUILD TOOLS: webpack, sass, electron-builder
       - npm install --offline
 
